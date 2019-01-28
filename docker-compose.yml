@@ -1,0 +1,39 @@
+version: '3.5'
+
+services:
+  php:
+    build:
+      context: ./docker/php
+      args:
+        - INSTALL_XDEBUG=${INSTALL_XDEBUG}
+    image: soap-task-app
+    container_name: soap-task-app
+    environment:
+      - PHP_IDE_CONFIG=serverName=localhost
+    volumes:
+      - .:/var/www/app
+    networks:
+      - soap-task
+    restart: always
+
+  nginx:
+    build: ./docker/nginx
+    image: soap-task-server
+    container_name: soap-task-server
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "8099:80"
+    depends_on:
+      - php
+    networks:
+      - soap-task
+    restart: always
+
+networks:
+  soap-task:
+    ipam:
+      config:
+        - subnet: "172.41.0.0/24"
+    name: soap-task
+
