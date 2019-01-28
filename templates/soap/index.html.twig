@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Soap task{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="/styles/main.css">
+{% endblock %}
+
+{% block body %}
+    <p><strong>Цель:</strong> обеспечить мониторинг стороннего (внешнего) сервиса</p>
+
+    <p><strong>Задача:</strong> создать простое web-приложение, для мониторинга внешнего сервиса, посредством отправки тестового запроса и сравнения его с эталоном ответа.</p>
+
+    <p><strong>Требования к реализации:</strong> нативный PHP, БД на свой выбор, ограничения по клиентской части (js и проч) — нет, приветствуется использование паттернов ООП.</p>
+
+    <h3>Описание</h3>
+    <p>Необходимо реализовать web-приложение, которое по крону будет выполнять тестовый запрос к wsdl сервису, сравнивать его ответ с эталоном и сохранять результат сравнения, временем реакции (время выполнения запроса) и вердиктом (OK|FAIL) в базу.</p>
+    <p>Кроме того, необходимо сохранять тело ответа сервиса (и по желанию, хедеры) в случае, если сравнение выдало FAIL. Желательно ограничить размер сохраняемых данных, во избежание переполнения базы (15 КБ на ответ, 3 КБ на хедеры).
+    Web-приложение должно обеспечивать удобный просмотр результатов тестов в популярных браузерах, с возможностью фильтровать данные по дате. Если дата не задана — показываем результаты за сегодня.
+    При выборе одного из результатов, система должна показать всю имеющуюся информацию о выбранном запросе:</p>
+    <ul>
+        <li>дата/время выполнения запроса</li>
+        <li>дата/время получения ответа</li>
+        <li>время ожидания [ формат: «% c (% мс)]</li>
+        <li>результат сравнения (ок/fail)</li>
+        <li>для запросов со статусом fail – тело ответа (+ хедеры по желанию)</li>
+    </ul>
+
+    <p>Примерный компоновка страницы результатов представлена ниже:</p>
+
+    <p><img src="/images/soap-task-sample.jpg" alt="UI sample"></p>
+
+    <h3>Тестовые данные</h3>
+
+    <p>Адрес системы: {{ url('app_wsdl') }}</p>
+
+    <p>Тестовый запрос:</p>
+
+    {% set requestExample %}
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dev="http://dev.soap-task.blackhole.marm.altarix.org">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <dev:getTaxiInfo>
+                    <regNum>ЕМ333777</regNum>
+                </dev:getTaxiInfo>
+            </soapenv:Body>
+        </soapenv:Envelope>
+    {% endset %}
+    <pre class="code">{{ requestExample|escape }}</pre>
+
+    <p>Эталонный ответ ("сырой"):</p>
+
+    {% set responseExample %}
+        <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="http://dev.soap-task.blackhole.marm.altarix.org">
+            <SOAP-ENV:Body>
+                <ns1:getTaxiInfoResponse>
+                    <getTaxiInfoResult>
+                        <licenseNum>02651</licenseNum>
+                        <licenseDate>2011-08-08T00:00:00+00:00</licenseDate>
+                        <name>ООО "НЖТ-ВОСТОК"</name>
+                        <ogrnNum>1107746402246</ogrnNum>
+                        <ogrnDate>2010-05-17T00:00:00+00:00</ogrnDate>
+                        <brand>FORD</brand>
+                        <model>FOCUS</model>
+                        <regNum>ЕМ333777</regNum>
+                        <year>2011</year>
+                        <blankNum>002695</blankNum>
+                        <info xsi:nil="true"/>
+                    </getTaxiInfoResult>
+                </ns1:getTaxiInfoResponse>
+            </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+    {% endset %}
+    <pre class="code">{{ responseExample|escape }}</pre>
+
+    <p><strong>Примечание:</strong> для упрощения задачи, в сравнении ответа — особо не огрничиваем, главное что бы указанные данные присутствовали и совпадали с указанными выше.</p>
+{% endblock %}

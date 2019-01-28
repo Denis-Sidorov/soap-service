@@ -52,4 +52,11 @@ class SoapController extends AbstractController {
         return new Response($result);
     }
 
+    /**
+     * @Route("/", methods={"GET"}, name="app_readme")
+     */
+    public function readme() {
+        return $this->render('soap/index.html.twig');
+    }
+
 }
